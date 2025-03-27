@@ -12,16 +12,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install dependencies
-        run: |
-          cd client
-          npm ci
-
-      - name: Build client
-        run: |
-          cd client
-          npm run build
-
       - name: Install lftp
         run: sudo apt-get install lftp -y
 
@@ -31,10 +21,30 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
+          # Create a list of local files to be deployed
+          cd client/
+          find . -type f | grep -v "node_modules" > ../client_files.txt
+          cd ..
+
           lftp -e "set ssl:verify-certificate no; \
           open ftp://$FTP_USERNAME:$FTP_PASSWORD@$FTP_SERVER; \
-          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob node_modules/ client/dist/ app.berrysol.com/; \
-          bye"app
+          cd app.berrysol.com/; \
+
+          # For each local file, check if it exists on remote and delete if so
+          cat client_files.txt | while read file; do \
+            if [ -f \"$file\" ]; then \
+              echo \"Checking if \$file exists on remote\"; \
+              glob -a \"rm -f \$file\" || echo \"File \$file not present\"; \
+            fi; \
+          done; \
+
+          # Upload client files, preserving node_modules if it exists
+          lcd client/; \
+          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob node_modules/ ./ ../app.berrysol.com/; \
+          bye"
+
+          rm client_files.txt
+
   deploy-server:
     runs-on: ubuntu-latest
     steps:
@@ -50,7 +60,26 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
+          # Create a list of local files to be deployed
+          cd server/
+          find . -type f | grep -v "node_modules" > ../server_files.txt
+          cd ..
+
           lftp -e "set ssl:verify-certificate no; \
           open ftp://$FTP_USERNAME:$FTP_PASSWORD@$FTP_SERVER; \
-          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob node_modules/ server/ testbackend.berrysol.com/; \
+          cd testbackend.berrysol.com/; \
+
+          # For each local file, check if it exists on remote and delete if so
+          cat server_files.txt | while read file; do \
+            if [ -f \"$file\" ]; then \
+              echo \"Checking if \$file exists on remote\"; \
+              glob -a \"rm -f \$file\" || echo \"File \$file not present\"; \
+            fi; \
+          done; \
+
+          # Upload server files, preserving node_modules if it exists
+          lcd server/; \
+          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob node_modules/ ./ ../testbackend.berrysol.com/; \
           bye"
+
+          rm server_files.txt

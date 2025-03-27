@@ -31,3 +31,5 @@ yarn-error.log*
 *.swp
 *.swo
 .DS_Store
+aws/task-server.pem
+aws/task_manage.pem
