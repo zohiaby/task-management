@@ -1,0 +1,57 @@
+version: "3.8"
+
+services:
+  client:
+    image: zohaiby33/task-client:latest
+    ports:
+      - "5173:5173"
+    restart: unless-stopped
+    environment:
+      - VITE_APP_BASE_URL=http://localhost:8800
+    depends_on:
+      - server
+
+  server:
+    image: zohaiby33/task-server:latest
+    ports:
+      - "8800:8800"
+      - "3001:3001"
+    restart: unless-stopped
+    environment:
+      - PORT=8800
+      - WS_PORT=3001
+      - NODE_ENV=development
+      - MONGODB_URL=mongodb://mongo:27017/taskmanagement
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=taskmanagement
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - JWT_SECRET=your_jwt_secret_here
+    depends_on:
+      - mongo
+      - postgres
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=taskmanagement
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+  postgres_data:

@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: task_management_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: task_management
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:4.4
+    container_name: task_management_mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task_management_backend
+    ports:
+      - "4000:4000"
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=task_management
+      - MONGODB_URI=mongodb://mongodb:27017/task_management
+      - JWT_SECRET=your-super-secret-jwt-key
+      - JWT_EXPIRES_IN=24h
+      - WS_PORT=3001
+    depends_on:
+      - postgres
+      - mongodb
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  mongodb_data: 

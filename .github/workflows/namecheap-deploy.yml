@@ -1,0 +1,56 @@
+name: Deploy to Namecheap
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-client:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+
+      - name: Install lftp
+        run: sudo apt-get install lftp -y
+
+      - name: Deploy client to Namecheap
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -e "set ssl:verify-certificate no; \
+          open ftp://$FTP_USERNAME:$FTP_PASSWORD@$FTP_SERVER; \
+          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob node_modules/ client/dist/ app.berrysol.com/; \
+          bye"app
+  deploy-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install lftp
+        run: sudo apt-get install lftp -y
+
+      - name: Deploy server to Namecheap
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          lftp -e "set ssl:verify-certificate no; \
+          open ftp://$FTP_USERNAME:$FTP_PASSWORD@$FTP_SERVER; \
+          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob node_modules/ server/ testbackend.berrysol.com/; \
+          bye"

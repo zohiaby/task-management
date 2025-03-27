@@ -1,0 +1,19 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
+# Not needed when using volumes in development, but including for completeness
+COPY . .
+
+# Expose Vite's default port
+EXPOSE 5173
+
+# Command to run the development server
+CMD ["npm", "run", "dev", "--", "--host"]
