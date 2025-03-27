@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   activateUserProfile,
   changeUserPassword,
   deleteUserProfile,
@@ -11,8 +11,8 @@ import {
   markNotificationRead,
   registerUser,
   updateUserProfile,
-} from "../controllers/userController.js";
-import { isAdminRoute, protectRoute } from "../middleware/authMiddleware.js";
+} = require("../controllers/userController");
+const { isAdminRoute, protectRoute } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -33,4 +33,4 @@ router
   .put(protectRoute, isAdminRoute, activateUserProfile)
   .delete(protectRoute, isAdminRoute, deleteUserProfile);
 
-export default router;
+module.exports = router;

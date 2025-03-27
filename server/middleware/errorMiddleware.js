@@ -20,4 +20,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-export { routeNotFound, errorHandler };
+module.exports = { routeNotFound, errorHandler };

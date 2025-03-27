@@ -1,19 +1,22 @@
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import dotenv from "dotenv";
-import express from "express";
-import morgan from "morgan";
-import path from "path";
-import { fileURLToPath } from "url";
-import { errorHandler, routeNotFound } from "./middleware/errorMiddleware.js";
-import routes from "./routes/index.js";
-import { connectMongoDB, initializePostgresDB } from "./config/database.js";
-import { createSocketServer } from "./services/socketService.js";
-import SocketService from "./services/socketService.js";
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const express = require("express");
+const morgan = require("morgan");
+const path = require("path");
+const {
+  errorHandler,
+  routeNotFound,
+} = require("./middleware/errorMiddleware.js");
+const routes = require("./routes/index.js");
+const {
+  connectMongoDB,
+  initializePostgresDB,
+} = require("./config/database.js");
+const { createSocketServer } = require("./services/socketService.js");
+const SocketService = require("./services/socketService.js");
 
 // Load environment variables from .env file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, ".env") });
 
 const app = express();

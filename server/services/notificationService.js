@@ -1,9 +1,9 @@
-import Notification from "../models/mongo/notificationModel.js";
-import Event from "../models/mongo/eventModel.js";
-import SocketService from "./socketService.js";
-import emailService from "./emailService.js";
-import { AppDataSource } from "../config/database.js";
-import User from "../models/postgres/User.js";
+const Notification = require("../models/mongo/notificationModel");
+const Event = require("../models/mongo/eventModel");
+const SocketService = require("./socketService");
+const emailService = require("./emailService");
+const { AppDataSource } = require("../config/database");
+const User = require("../models/postgres/User");
 
 class NotificationService {
   // Create notification and send through appropriate channels
@@ -171,4 +171,4 @@ class NotificationService {
   }
 }
 
-export default new NotificationService();
+module.exports = new NotificationService();

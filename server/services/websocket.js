@@ -1,5 +1,5 @@
-import { Server } from "socket.io";
-import jwt from "jsonwebtoken";
+const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
 
 // Connected users' socket mapping
 const connectedUsers = new Map();
@@ -7,11 +7,7 @@ const connectedUsers = new Map();
 const initializeWebSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: [
-        "https://mern-task-manager-app.netlify.app",
-        "http://localhost:3000",
-        "http://localhost:3001",
-      ],
+      origin: ["*"],
       methods: ["GET", "POST"],
       credentials: true,
     },
@@ -66,4 +62,4 @@ const initializeWebSocket = (server) => {
   };
 };
 
-export default initializeWebSocket;
+module.exports = initializeWebSocket;

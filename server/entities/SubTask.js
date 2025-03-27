@@ -1,6 +1,6 @@
-import { EntitySchema } from "typeorm";
+const { EntitySchema } = require("typeorm");
 
-export const SubTask = new EntitySchema({
+const SubTask = new EntitySchema({
   name: "SubTask",
   tableName: "subtasks",
   columns: {
@@ -41,3 +41,5 @@ export const SubTask = new EntitySchema({
     },
   },
 });
+
+module.exports = { SubTask };

@@ -1,12 +1,12 @@
-import { Server } from "socket.io";
-import jwt from "jsonwebtoken";
-import http from "http";
+const { Server } = require("socket.io");
+const jwt = require("jsonwebtoken");
+const http = require("http");
 
 // Connected users' socket mapping
 const connectedUsers = new Map();
 
 // Create socket.io server
-export const createSocketServer = (expressApp) => {
+const createSocketServer = (expressApp) => {
   const server = http.createServer(expressApp);
   const io = new Server(server, {
     cors: {
@@ -93,4 +93,6 @@ class SocketService {
   }
 }
 
-export default new SocketService();
+const socketService = new SocketService();
+module.exports = socketService;
+module.exports.createSocketServer = createSocketServer;

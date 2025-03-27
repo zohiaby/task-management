@@ -1,4 +1,4 @@
-import { connectMongoDB, initializePostgresDB } from "../config/database.js";
+const { connectMongoDB, initializePostgresDB } = require("../config/database");
 
 const dbConnection = async () => {
   try {
@@ -15,4 +15,4 @@ const dbConnection = async () => {
   }
 };
 
-export default dbConnection;
+module.exports = dbConnection;

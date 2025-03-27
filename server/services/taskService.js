@@ -1,11 +1,11 @@
-import { AppDataSource } from "../config/database.js";
-import { isValidUUID, filterValidUUIDs } from "../utils/validators.js";
-import Task from "../models/postgres/Task.js";
-import SubTask from "../models/postgres/SubTask.js";
-import User from "../models/postgres/User.js";
-import notificationService from "./notificationService.js";
-import socketService from "./socketService.js";
-import emailService from "./emailService.js";
+const { AppDataSource } = require("../config/database.js");
+const { isValidUUID, filterValidUUIDs } = require("../utils/validators.js");
+const Task = require("../models/postgres/Task.js");
+const SubTask = require("../models/postgres/SubTask.js");
+const User = require("../models/postgres/User.js");
+const notificationService = require("./notificationService.js");
+const socketService = require("./socketService.js");
+const { In } = require("typeorm");
 
 class TaskService {
   async createTask(taskData, creatorId) {
@@ -259,7 +259,7 @@ class TaskService {
     }
 
     const userRepository = AppDataSource.getRepository(User);
-    const users = await userRepository.findByIds(validAssigneeIds);
+    const users = await userRepository.findBy({ id: In(validAssigneeIds) });
 
     task.assignees = users;
     return await AppDataSource.getRepository(Task).save(task);
@@ -314,4 +314,4 @@ class TaskService {
   }
 }
 
-export default new TaskService();
+module.exports = new TaskService();

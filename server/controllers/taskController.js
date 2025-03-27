@@ -1,14 +1,14 @@
-import asyncHandler from "express-async-handler";
-import taskService from "../services/taskService.js";
-import notificationService from "../services/notificationService.js";
-import { AppDataSource } from "../config/database.js";
-import Task from "../models/postgres/Task.js";
-import SubTask from "../models/postgres/SubTask.js";
-import User from "../models/postgres/User.js";
-import Asset from "../models/postgres/Asset.js";
-import socketService from "../services/socketService.js";
-import { isValidUUID } from "../utils/validators.js";
-import { In } from "typeorm"; // Add this import for the In operator
+const asyncHandler = require("express-async-handler");
+const taskService = require("../services/taskService");
+const notificationService = require("../services/notificationService");
+const { AppDataSource } = require("../config/database");
+const Task = require("../models/postgres/Task");
+const SubTask = require("../models/postgres/SubTask");
+const User = require("../models/postgres/User");
+const Asset = require("../models/postgres/Asset");
+const socketService = require("../services/socketService");
+const { isValidUUID } = require("../utils/validators");
+const { In } = require("typeorm"); // Add this import for the In operator
 
 // Helper function to extract and limit fileType length
 const getFileType = (url) => {
@@ -858,7 +858,7 @@ const deleteTask = asyncHandler(async (req, res) => {
   }
 });
 
-export {
+module.exports = {
   createSubTask,
   createTask,
   dashboardStatistics,

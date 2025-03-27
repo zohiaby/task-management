@@ -1,5 +1,5 @@
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
+const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendTaskAssignmentEmail = async (
+const sendTaskAssignmentEmail = async (
   userEmail,
   userName,
   taskTitle,
@@ -50,7 +50,7 @@ export const sendTaskAssignmentEmail = async (
   }
 };
 
-export const sendTaskUpdateEmail = async (
+const sendTaskUpdateEmail = async (
   userEmail,
   userName,
   taskTitle,
@@ -84,7 +84,7 @@ export const sendTaskUpdateEmail = async (
   }
 };
 
-export default {
+module.exports = {
   sendTaskAssignmentEmail,
   sendTaskUpdateEmail,
 };

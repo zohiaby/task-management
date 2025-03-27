@@ -1,7 +1,7 @@
-import { EntitySchema } from "typeorm";
-import bcrypt from "bcryptjs";
+const { EntitySchema } = require("typeorm");
+const bcrypt = require("bcryptjs");
 
-export const User = new EntitySchema({
+const User = new EntitySchema({
   name: "User",
   tableName: "users",
   columns: {
@@ -72,11 +72,17 @@ export const User = new EntitySchema({
 });
 
 // Add password hashing methods similar to mongoose schema methods
-export const hashPassword = async (password) => {
+const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
 };
 
-export const comparePassword = async (enteredPassword, hashedPassword) => {
+const comparePassword = async (enteredPassword, hashedPassword) => {
   return await bcrypt.compare(enteredPassword, hashedPassword);
+};
+
+module.exports = {
+  User,
+  hashPassword,
+  comparePassword,
 };

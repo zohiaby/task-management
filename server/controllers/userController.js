@@ -1,9 +1,9 @@
-import asyncHandler from "express-async-handler";
-import userService from "../services/userService.js";
-import notificationService from "../services/notificationService.js";
-import { AppDataSource } from "../config/database.js";
-import User from "../models/postgres/User.js";
-import { hashPassword } from "../models/postgres/User.js";
+const asyncHandler = require("express-async-handler");
+const userService = require("../services/userService");
+const notificationService = require("../services/notificationService");
+const { AppDataSource } = require("../config/database");
+const User = require("../models/postgres/User");
+const { hashPassword } = require("../models/postgres/User");
 
 // Register a new user
 const registerUser = asyncHandler(async (req, res) => {
@@ -339,7 +339,7 @@ const markNotificationRead = asyncHandler(async (req, res) => {
   }
 });
 
-export {
+module.exports = {
   activateUserProfile,
   changeUserPassword,
   deleteUserProfile,

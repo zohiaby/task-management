@@ -1,7 +1,7 @@
-import asyncHandler from "express-async-handler";
-import jwt from "jsonwebtoken";
-import { AppDataSource } from "../config/database.js";
-import User from "../models/postgres/User.js";
+const asyncHandler = require("express-async-handler");
+const jwt = require("jsonwebtoken");
+const { AppDataSource } = require("../config/database.js");
+const User = require("../models/postgres/User.js");
 
 const protectRoute = asyncHandler(async (req, res, next) => {
   // Get token from cookie or authorization header
@@ -70,4 +70,4 @@ const isAdminRoute = (req, res, next) => {
   }
 };
 
-export { isAdminRoute, protectRoute };
+module.exports = { isAdminRoute, protectRoute };

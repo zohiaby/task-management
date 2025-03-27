@@ -1,10 +1,8 @@
-import { AppDataSource } from "../config/database.js";
-import User, {
-  hashPassword,
-  comparePassword,
-} from "../models/postgres/User.js";
-import jwt from "jsonwebtoken";
-import notificationService from "./notificationService.js";
+const { AppDataSource } = require("../config/database");
+const User = require("../models/postgres/User");
+const { hashPassword, comparePassword } = User;
+const jwt = require("jsonwebtoken");
+const notificationService = require("./notificationService");
 
 class UserService {
   async registerUser(userData, isSignup = true) {
@@ -97,4 +95,5 @@ class UserService {
   }
 }
 
-export default new UserService();
+// export default new UserService();
+module.exports = new UserService();

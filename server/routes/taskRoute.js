@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createSubTask,
   createTask,
   dashboardStatistics,
@@ -12,11 +12,9 @@ import {
   updateSubTaskStage,
   updateTask,
   updateTaskStage,
-  updateTaskStatus,
-  addSubTask,
   deleteTask,
-} from "../controllers/taskController.js";
-import { isAdminRoute, protectRoute } from "../middleware/authMiddleware.js";
+} = require("../controllers/taskController");
+const { isAdminRoute, protectRoute } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -48,4 +46,5 @@ router.delete(
 // Add proper delete task route
 router.delete("/:id", protectRoute, deleteTask);
 
-export default router;
+// export default router;
+module.exports = router;

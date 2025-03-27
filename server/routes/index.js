@@ -1,7 +1,7 @@
-import express from "express";
-import userRoutes from "./userRoute.js";
-import taskRoutes from "./taskRoute.js";
-import { protectRoute } from "../middleware/authMiddleware.js";
+const express = require("express");
+const userRoutes = require("./userRoute.js");
+const taskRoutes = require("./taskRoute.js");
+const { protectRoute } = require("../middleware/authMiddleware.js");
 
 const router = express.Router();
 
@@ -39,4 +39,4 @@ router.get("/protected", protectRoute, (req, res) => {
 router.use("/user", userRoutes);
 router.use("/task", taskRoutes);
 
-export default router;
+module.exports = router;

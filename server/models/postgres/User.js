@@ -1,5 +1,5 @@
-import { EntitySchema } from "typeorm";
-import bcrypt from "bcryptjs";
+const { EntitySchema } = require("typeorm");
+const bcrypt = require("bcryptjs");
 
 const User = new EntitySchema({
   name: "User",
@@ -75,14 +75,16 @@ const User = new EntitySchema({
   ],
 });
 
-export default User;
-
 // Helper methods for User entity
-export const hashPassword = async (password) => {
+const hashPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
   return await bcrypt.hash(password, salt);
 };
 
-export const comparePassword = async (enteredPassword, hashedPassword) => {
+const comparePassword = async (enteredPassword, hashedPassword) => {
   return await bcrypt.compare(enteredPassword, hashedPassword);
 };
+
+module.exports = User;
+module.exports.hashPassword = hashPassword;
+module.exports.comparePassword = comparePassword;
