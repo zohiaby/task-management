@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
+const mongoose = require("mongoose");
 const {
   errorHandler,
   routeNotFound,
@@ -52,21 +53,51 @@ app.get("/test", (req, res) => {
   res.send("Server is working! 🎉");
 });
 
+// Define database error handler route
+app.get("/api/server-status", (req, res) => {
+  const dbStatus = {
+    mongodb:
+      mongoose.connection?.readyState === 1 ? "connected" : "disconnected",
+    postgres: AppDataSource.isInitialized ? "connected" : "disconnected",
+  };
+
+  res.json({
+    server: "online",
+    databases: dbStatus,
+    environment: process.env.NODE_ENV || "development",
+  });
+});
+
 // Initialize databases and start server
 const start = async () => {
   try {
     console.log("MongoDB URL:", process.env.MONGODB_URL); // Debug log
 
-    // Initialize both databases before setting up routes
+    // Initialize MongoDB first
     await connectMongoDB();
-    await initializePostgresDB();
 
-    // Confirm AppDataSource is ready
-    if (!AppDataSource.isInitialized) {
-      throw new Error("PostgreSQL Data Source failed to initialize properly");
+    // Try to initialize PostgreSQL, but don't fail the server if it's not available
+    try {
+      await initializePostgresDB();
+
+      // Confirm AppDataSource is ready
+      if (!AppDataSource.isInitialized) {
+        console.warn(
+          "Warning: PostgreSQL Data Source failed to initialize properly"
+        );
+      }
+    } catch (dbError) {
+      console.error("PostgreSQL connection error:", dbError.message);
+      console.log("\n===========================================");
+      console.log("⚠️  PostgreSQL connection failed!");
+      console.log("The server will start with limited functionality.");
+      console.log(
+        "Make sure PostgreSQL is running and check your connection settings."
+      );
+      console.log("===========================================\n");
     }
 
-    // API routes - only set up after database initialization
+    // API routes - set up regardless of database status
     app.use("/api", routes);
 
     // Error handling
