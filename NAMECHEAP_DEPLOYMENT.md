@@ -22,6 +22,7 @@ This guide explains how to deploy both the client and server parts of the Task M
 1. In cPanel, find and click on "Node.js Selector"
 2. Click "Create Application"
 3. Fill in the following details:
+
    - Node.js version: Select the compatible version (recommended: Node.js 16.x or higher)
    - Application mode: Production
    - Application root: The directory path where you uploaded server files

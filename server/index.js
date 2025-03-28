@@ -12,6 +12,7 @@ const routes = require("./routes/index.js");
 const {
   connectMongoDB,
   initializePostgresDB,
+  AppDataSource,
 } = require("./config/database.js");
 const { createSocketServer } = require("./services/socketService.js");
 const SocketService = require("./services/socketService.js");
@@ -46,32 +47,39 @@ if (process.env.NODE_ENV === "development") {
 const { server, io } = createSocketServer(app);
 SocketService.initialize(io);
 
-// API routes
-app.use("/api", routes);
+// Test route
+app.get("/test", (req, res) => {
+  res.send("Server is working! 🎉");
+});
 
-// Error handling
-app.use(routeNotFound);
-app.use(errorHandler);
-
-// Initialize databases
+// Initialize databases and start server
 const start = async () => {
   try {
     console.log("MongoDB URL:", process.env.MONGODB_URL); // Debug log
+
+    // Initialize both databases before setting up routes
     await connectMongoDB();
     await initializePostgresDB();
 
-    const port = process.env.PORT || 4000;
-    const wsPort = process.env.WS_PORT || 3001;
+    // Confirm AppDataSource is ready
+    if (!AppDataSource.isInitialized) {
+      throw new Error("PostgreSQL Data Source failed to initialize properly");
+    }
 
-    server.listen(wsPort, () =>
-      console.log(`WebSocket server running on port ${wsPort}`)
-    );
+    // API routes - only set up after database initialization
+    app.use("/api", routes);
 
-    app.listen(port, () =>
+    // Error handling
+    app.use(routeNotFound);
+    app.use(errorHandler);
+
+    const port = process.env.PORT || 4000; // Use one port for both HTTP and WebSocket
+
+    server.listen(port, () => {
       console.log(
-        `API server running in ${process.env.NODE_ENV} mode on port ${port}`
-      )
-    );
+        `Server running in ${process.env.NODE_ENV} mode on port ${port} (HTTP and WebSocket)`
+      );
+    });
   } catch (error) {
     console.error("Server initialization failed:", error);
     process.exit(1);

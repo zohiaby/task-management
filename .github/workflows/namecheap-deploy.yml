@@ -12,6 +12,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Install client dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Build client
+        run: |
+          cd client
+          npx vite build
+
       - name: Install lftp
         run: sudo apt-get install lftp -y
 
@@ -21,29 +36,28 @@ jobs:
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
-          # Create a list of local files to be deployed
-          cd client/
-          find . -type f | grep -v "node_modules" > ../client_files.txt
-          cd ..
+          # Create a list of files in the dist directory
+          cd client/dist/
+          find . -type f > ../../client_dist_files.txt
+          cd ../..
 
           lftp -e "set ssl:verify-certificate no; \
           open ftp://$FTP_USERNAME:$FTP_PASSWORD@$FTP_SERVER; \
           cd app.berrysol.com/; \
 
-          # For each local file, check if it exists on remote and delete if so
-          cat client_files.txt | while read file; do \
-            if [ -f \"$file\" ]; then \
-              echo \"Checking if \$file exists on remote\"; \
-              glob -a \"rm -f \$file\" || echo \"File \$file not present\"; \
-            fi; \
+          # For each file in dist, check if it exists on remote and delete if so
+          cat client_dist_files.txt | while read file; do \
+            remotefile=\$(echo \$file | sed 's|^./||'); \
+            echo \"Checking if \$remotefile exists on remote\"; \
+            glob -a \"rm -f \$remotefile\" || echo \"File \$remotefile not present\"; \
           done; \
 
-          # Upload client files, preserving node_modules if it exists
-          lcd client/; \
-          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ --exclude-glob node_modules/ ./ ../app.berrysol.com/; \
+          # Upload all files from dist folder to root directory
+          lcd client/dist/; \
+          mirror -R --verbose --exclude-glob .git/ --exclude-glob .github/ ./ ../app.berrysol.com/; \
           bye"
 
-          rm client_files.txt
+          rm client_dist_files.txt
 
   deploy-server:
     runs-on: ubuntu-latest
@@ -71,10 +85,9 @@ jobs:
 
           # For each local file, check if it exists on remote and delete if so
           cat server_files.txt | while read file; do \
-            if [ -f \"$file\" ]; then \
-              echo \"Checking if \$file exists on remote\"; \
-              glob -a \"rm -f \$file\" || echo \"File \$file not present\"; \
-            fi; \
+            remotefile=\$(echo \$file | sed 's|^./||'); \
+            echo \"Checking if \$remotefile exists on remote\"; \
+            glob -a \"rm -f \$remotefile\" || echo \"File \$remotefile not present\"; \
           done; \
 
           # Upload server files, preserving node_modules if it exists
